@@ -12,9 +12,9 @@ tasks:
 
   clean:
     cmds:
-      - rm -vrf build
+      - rm -vrf grpcntt
 
   build:
     deps: [generate]
     cmds:
-      - go build -o build/grpcntt
+      - go build -o grpcntt
