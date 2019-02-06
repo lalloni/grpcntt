@@ -1,0 +1,20 @@
+version: '2'
+
+tasks:
+
+  generate:
+    cmds:
+      - protoc --go_out=plugins=grpc:. rpc/service.proto
+    sources:
+      - rpc/*.proto
+    generates:
+      - rpc/*.go
+
+  clean:
+    cmds:
+      - rm -vrf build
+
+  build:
+    deps: [generate]
+    cmds:
+      - go build -o build/grpcntt
