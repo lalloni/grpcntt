@@ -13,7 +13,7 @@ func main() {
 
 	app := kingpin.New(os.Args[0], "A gRPC network testing tool")
 	serverAddress := app.Flag("address", "Server address").Default(":80").String()
-	useTLS := app.Flag("tls", "Use TLS").Bool()
+	useTLS := app.Flag("tls", "Use TLS (server mode generates a self-signed certificate, client mode skips certificate verification)").Bool()
 
 	serve := app.Command("serve", "Start the testing server")
 
