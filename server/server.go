@@ -15,17 +15,14 @@ import (
 )
 
 func Serve(address string, usetls bool) error {
-	s := "disabled"
-	if usetls {
-		s = "enabled"
-	}
-	log.Infof("starting server listening at %s with tls %s", address, s)
+
+	log.Infof("starting server listening at %s", address)
+
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return errors.Wrapf(err, "trying to listen on address %s", address)
 	}
-	server := grpc.NewServer()
-	rpc.RegisterServiceServer(server, &serviceImpl{})
+
 	if usetls {
 		key, cert, err := common.GenerateSelfSignedCertificate("", "", 1024, time.Now(), 24*time.Hour, false)
 		if err != nil {
@@ -38,8 +35,14 @@ func Serve(address string, usetls bool) error {
 		listener = tls.NewListener(listener, &tls.Config{
 			Certificates: []tls.Certificate{pair},
 		})
+		log.Info("tls enabled")
 	}
+
+	server := grpc.NewServer()
+	rpc.RegisterServiceServer(server, &serviceImpl{})
+
 	return server.Serve(listener)
+
 }
 
 type serviceImpl struct {
