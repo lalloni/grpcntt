@@ -1,20 +1,33 @@
 version: '2'
 
+vars:
+  BUILD: "build"
+  BIN: "{{.BUILD}}/grpcntt{{exeExt}}"
+
 tasks:
+
+  default:
+    cmds:
+      - task: build
 
   generate:
     cmds:
-      - protoc --go_out=plugins=grpc:. rpc/service.proto
+      - "protoc --go_out=plugins=grpc:. rpc/service.proto"
     sources:
-      - rpc/*.proto
+      - "rpc/*.proto"
     generates:
-      - rpc/*.go
+      - "rpc/*.go"
 
   clean:
     cmds:
-      - rm -vrf grpcntt
+      - "rm -vrf {{.BUILD}}"
 
   build:
-    deps: [generate]
+    deps: [ generate ]
     cmds:
-      - go build -o grpcntt
+      - "go build -o {{.BIN}}"
+    sources:
+      - "*.go"
+      - "**/*.go"
+    generates:
+      - "{{.BIN}}"
