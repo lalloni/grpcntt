@@ -14,7 +14,7 @@ import (
 	"github.com/lalloni/grpcntt/rpc"
 )
 
-func Serve(address string, usetls bool) error {
+func Serve(org string, hosts []string, address string, usetls bool) error {
 
 	log.Infof("starting server listening at %s", address)
 
@@ -24,7 +24,7 @@ func Serve(address string, usetls bool) error {
 	}
 
 	if usetls {
-		key, cert, err := common.GenerateSelfSignedCertificate("", "", 1024, time.Now(), 24*time.Hour, false)
+		key, cert, err := common.GenerateSelfSignedCertificate(org, hosts, "", 1024, time.Now(), 24*time.Hour, false)
 		if err != nil {
 			return errors.Wrap(err, "generating self signed TLS certificate")
 		}

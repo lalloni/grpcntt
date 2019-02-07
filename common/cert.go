@@ -11,7 +11,6 @@ import (
 	"encoding/pem"
 	"math/big"
 	"net"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -43,7 +42,7 @@ func pemBlockForKey(priv interface{}) (*pem.Block, error) {
 	}
 }
 
-func GenerateSelfSignedCertificate(host, ecdsaCurve string, rsaBits int, validFrom time.Time, validFor time.Duration, isCA bool) (key []byte, cert []byte, err error) {
+func GenerateSelfSignedCertificate(org string, hosts []string, ecdsaCurve string, rsaBits int, validFrom time.Time, validFor time.Duration, isCA bool) (key []byte, cert []byte, err error) {
 
 	var priv crypto.PrivateKey
 
@@ -59,7 +58,7 @@ func GenerateSelfSignedCertificate(host, ecdsaCurve string, rsaBits int, validFr
 	case "P521":
 		priv, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
-		return nil, nil, errors.Errorf("uUnrecognized elliptic curve: %q", ecdsaCurve)
+		return nil, nil, errors.Errorf("unrecognized elliptic curve: %q", ecdsaCurve)
 	}
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "generating private key")
@@ -75,7 +74,7 @@ func GenerateSelfSignedCertificate(host, ecdsaCurve string, rsaBits int, validFr
 	}
 
 	template := x509.Certificate{
-		Subject:               pkix.Name{Organization: []string{"Acme"}},
+		Subject:               pkix.Name{Organization: []string{org}},
 		SerialNumber:          serialNumber,
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
@@ -84,7 +83,6 @@ func GenerateSelfSignedCertificate(host, ecdsaCurve string, rsaBits int, validFr
 		BasicConstraintsValid: true,
 	}
 
-	hosts := strings.Split(host, ",")
 	for _, h := range hosts {
 		if ip := net.ParseIP(h); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
